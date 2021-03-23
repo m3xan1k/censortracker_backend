@@ -49,7 +49,7 @@ def blocked_domains():
                   .filter(latest_case__gte=hour_ago)
                   .values_list('domain', flat=True))
     return (Domain.objects
-            .filter(pk__in=domain_pks)
+            .filter(pk__in=domain_pks, notified=False)
             .values_list('domain', flat=True))
 
 
@@ -58,6 +58,7 @@ def check_blocked():
     if not domains:
         return
     alert_to_slack(domains)
+    domains.update(notified=True)
 
 
 def chunks(iterable, size):
