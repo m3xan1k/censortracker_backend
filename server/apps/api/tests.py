@@ -1,6 +1,8 @@
 from django.test import TestCase
 
-from server.apps.api.management.commands.update_ip_data import blocked_domains, update_ip_data
+from server.apps.api.management.commands.update_ip_data import (blocked_domains,
+                                                                check_blocked,
+                                                                update_ip_data)
 from server.apps.api.models import Domain, Case
 
 
@@ -69,9 +71,6 @@ class CheckBlockedTest(TestCase):
         self.assertTrue('example_1.com' in domains)
 
     def test_ignore_already_notified_domains(self):
-        domains = blocked_domains()
-        self.assertTrue('example_2.com' in domains)
-        self.assertTrue('example_3.com' in domains)
-
+        check_blocked()
         duplicate_domains = blocked_domains()
         self.assertEqual(duplicate_domains.count(), 0)
