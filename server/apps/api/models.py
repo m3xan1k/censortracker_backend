@@ -10,6 +10,9 @@ class Domain(models.Model):
         null=False,
         blank=False,
     )
+    notified = models.BooleanField(
+        default=False
+    )
 
     class Meta:
         verbose_name = 'Domain'
