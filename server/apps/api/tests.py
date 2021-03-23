@@ -10,7 +10,7 @@ class CheckBlockedTest(TestCase):
     def setUp(self):
         # create domains
         domains = Domain.objects.bulk_create(
-            [Domain(domain=f'example_{n}.com') for n in range(3)]
+            [Domain(domain=f'example_{n}.com') for n in range(4)]
         )
 
         # create cases
@@ -36,6 +36,23 @@ class CheckBlockedTest(TestCase):
                 client_region=regions[i]
             )
 
+        # report multiple domains
+        for i in range(2):
+            Case.objects.create(
+                domain=domains[2],
+                client_ip=ip_addresses[i],
+                client_provider=providers[i],
+                client_region=regions[i]
+            )
+
+        for i in range(2):
+            Case.objects.create(
+                domain=domains[3],
+                client_ip=ip_addresses[i],
+                client_provider=providers[i],
+                client_region=regions[i]
+            )
+
         # hash cases
         update_ip_data()
 
@@ -50,3 +67,11 @@ class CheckBlockedTest(TestCase):
     def test_single_domain_from_multiple_clients(self):
         domains = blocked_domains()
         self.assertTrue('example_1.com' in domains)
+
+    def test_ignore_already_notified_domains(self):
+        domains = blocked_domains()
+        self.assertTrue('example_2.com' in domains)
+        self.assertTrue('example_3.com' in domains)
+
+        duplicate_domains = blocked_domains()
+        self.assertEqual(duplicate_domains.count(), 0)
