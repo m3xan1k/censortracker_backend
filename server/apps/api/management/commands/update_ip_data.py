@@ -15,7 +15,7 @@ from server.apps.api.logic import notifier
 
 
 MIN_CASE_COUNT_PER_DOMAIN = 2
-SIGNIFICANT_CASES_PERIOD_DAYS = 3
+SIGNIFICANT_CASES_PERIOD_DAYS = 1
 
 
 class Command(BaseCommand):
@@ -42,7 +42,7 @@ def blocked_domains():
                   .values('domain_id', 'client_hash')
                   .distinct()
                   .values('domain_id')
-                  .annotate(hash_count=Count('client_hash'))
+                  .annotate(hash_count=Count('client_hash', distinct=True))
                   .values('domain_id', 'hash_count')
                   .filter(hash_count__gte=MIN_CASE_COUNT_PER_DOMAIN)
                   .annotate(latest_case=Max('created'))
